@@ -2,13 +2,13 @@ import { ClientConfig, Client } from "@line/bot-sdk";
 const { Configuration, OpenAIApi } = require("openai");
 
 // LINEアクセストークンとチャンネルシークレットをenvから読み込む
-const clientConfig: ClientConfig = {
+const lineClientConfig: ClientConfig = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
   channelSecret: process.env.LINE_CHANNEL_SECRET || "",
 };
 
 // LINE Clientインスタンス化
-const client: Client = new Client(clientConfig);
+const lineClient: Client = new Client(lineClientConfig);
 
 /** OPEN AIのAPI叩く
  * @param inputText 入力テキスト
@@ -45,7 +45,7 @@ exports.handler = async (event: any, _context: any) => {
     const inputText = body.events[0].message.text;
     const replyText: string = await chatGptResponse(inputText);
 
-    await client.replyMessage(body.events[0].replyToken, {
+    await lineClient.replyMessage(body.events[0].replyToken, {
       type: "text",
       text: replyText,
     });
