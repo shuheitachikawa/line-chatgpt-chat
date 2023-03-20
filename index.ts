@@ -17,21 +17,21 @@ const client: Client = new Client(clientConfig);
 /** chatGPTのAPI叩く
  * @param inputText 入力テキスト
  * @returns 返答テキスト
+ * @see https://platform.openai.com/docs/api-reference/completions/create?lang=node.js
  */
 const chatGptResponse = async (inputText: string): Promise<string> => {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
-
   const openai = new OpenAIApi(configuration);
-
-  const completion = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
-    messages: [{ role: "user", content: inputText }],
+  const { data } = await openai.createCompletion({
+    model: "text-davinci-003",
+    prompt: inputText,
+    max_tokens: 1000,
+    temperature: 0,
   });
 
-  console.log({ completion });
-  return completion.data.choices[0].message;
+  return data.choices[0].text;
 };
 
 // 実行
