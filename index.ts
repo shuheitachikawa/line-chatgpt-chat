@@ -24,8 +24,8 @@ const getChatGptResponse = async (inputText: string): Promise<string> => {
     gpt3Endpoint,
     {
       prompt: inputText,
-      max_tokens: 250,
-      temperature: 0.7,
+      max_tokens: 1000,
+      temperature: 1.0,
     },
     {
       headers: {
