@@ -9,8 +9,7 @@ const clientConfig: ClientConfig = {
 
 // GPT-3のAPIキーとエンドポイントをenvから読み込む
 const gpt3ApiKey = process.env.GPT3_API_KEY!;
-const gpt3Endpoint =
-  "https://api.openai.com/v1/engines/text-davinci-003/completions";
+const gpt3Endpoint = "https://api.openai.com/v1/chat/completions";
 
 // LINE Clientインスタンス化
 const client: Client = new Client(clientConfig);
@@ -22,10 +21,14 @@ const client: Client = new Client(clientConfig);
 const getChatGptResponse = async (inputText: string): Promise<string> => {
   const { data } = await axios.post(
     gpt3Endpoint,
+    // {
+    //   prompt: inputText,
+    //   max_tokens: 1000,
+    //   temperature: 1.0,
+    // },
     {
-      prompt: inputText,
-      max_tokens: 1000,
-      temperature: 1.0,
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: inputText }],
     },
     {
       headers: {
