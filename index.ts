@@ -27,7 +27,7 @@ const chatGptResponse = async (inputText: string): Promise<string> => {
     temperature: 0,
   });
 
-  return data.choices[0].text;
+  return data.choices[0].text.trim();
 };
 
 // 実行
