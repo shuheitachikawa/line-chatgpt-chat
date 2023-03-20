@@ -1,5 +1,5 @@
 import { ClientConfig, Client } from "@line/bot-sdk";
-import axios from "axios";
+const { Configuration, OpenAIApi } = require("openai");
 
 // LINEアクセストークンとチャンネルシークレットをenvから読み込む
 const clientConfig: ClientConfig = {
@@ -8,8 +8,8 @@ const clientConfig: ClientConfig = {
 };
 
 // GPT-3のAPIキーとエンドポイントをenvから読み込む
-const gpt3ApiKey = process.env.GPT3_API_KEY!;
-const gpt3Endpoint = "https://api.openai.com/v1/chat/completions";
+// const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+// const gpt3Endpoint = "https://api.openai.com/v1/chat/completions";
 
 // LINE Clientインスタンス化
 const client: Client = new Client(clientConfig);
@@ -18,27 +18,20 @@ const client: Client = new Client(clientConfig);
  * @param inputText 入力テキスト
  * @returns 返答テキスト
  */
-const getChatGptResponse = async (inputText: string): Promise<string> => {
-  const { data } = await axios.post(
-    gpt3Endpoint,
-    // {
-    //   prompt: inputText,
-    //   max_tokens: 1000,
-    //   temperature: 1.0,
-    // },
-    {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: inputText }],
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${gpt3ApiKey}`,
-      },
-    }
-  );
+const chatGptResponse = async (inputText: string): Promise<string> => {
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
-  return data.choices[0].text.trimStart();
+  const openai = new OpenAIApi(configuration);
+
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: inputText }],
+  });
+
+  console.log({ completion });
+  return completion.data.choices[0].message;
 };
 
 // 実行
@@ -54,7 +47,7 @@ exports.handler = async (event: any, _context: any) => {
     }
 
     const inputText = body.events[0].message.text;
-    const replyText: string = await getChatGptResponse(inputText);
+    const replyText: string = await chatGptResponse(inputText);
 
     await client.replyMessage(body.events[0].replyToken, {
       type: "text",
