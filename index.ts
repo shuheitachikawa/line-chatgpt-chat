@@ -7,14 +7,10 @@ const clientConfig: ClientConfig = {
   channelSecret: process.env.LINE_CHANNEL_SECRET || "",
 };
 
-// GPT-3のAPIキーとエンドポイントをenvから読み込む
-// const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
-// const gpt3Endpoint = "https://api.openai.com/v1/chat/completions";
-
 // LINE Clientインスタンス化
 const client: Client = new Client(clientConfig);
 
-/** chatGPTのAPI叩く
+/** OPEN AIのAPI叩く
  * @param inputText 入力テキスト
  * @returns 返答テキスト
  * @see https://platform.openai.com/docs/api-reference/completions/create?lang=node.js
