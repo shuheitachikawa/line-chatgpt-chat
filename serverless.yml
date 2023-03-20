@@ -1,5 +1,5 @@
 service: line-ai-chat
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
@@ -13,6 +13,7 @@ plugins:
 functions:
   api:
     handler: index.handler
+    timeout: 60 # Lambdaのタイムアウト時間
     events:
       - httpApi:
           path: /
