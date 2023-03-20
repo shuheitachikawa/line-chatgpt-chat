@@ -1,91 +1,63 @@
-// module.exports.handler = async (event) => {
-//   return {
-//     statusCode: 200,
-//     body: JSON.stringify(
-//       {
-//         message: "Go Serverless v3.0! Your function executed successfully!",
-//         input: event,
-//       },
-//       null,
-//       2
-//     ),
-//   };
-// };
+import { ClientConfig, Client } from "@line/bot-sdk";
+import axios from "axios";
 
-// import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-// import * as line from '@line/bot-sdk';
-// import axios from 'axios';
-
-// const config: line.ClientConfig = {
-//   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN!,
-//   channelSecret: process.env.LINE_CHANNEL_SECRET!,
-// };
-// const client = new line.Client(config);
-
-// const gpt3ApiKey = process.env.GPT3_API_KEY!;
-// const gpt3Endpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions';
-
-// export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-//   const lineEvents = client.parseEventsFromRequestBody(event.body!);
-//   const promises: Promise<any>[] = [];
-
-//   for (const lineEvent of lineEvents) {
-//     if (lineEvent.type === 'message' && lineEvent.message.type === 'text') {
-//       const inputText = lineEvent.message.text;
-
-//       const response = await axios.post(
-//         gpt3Endpoint,
-//         {
-//           prompt: inputText,
-//           max_tokens: 50,
-//           temperature: 0.7,
-//           n: 1,
-//           stop: ['\n']
-//         },
-//         {
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${gpt3ApiKey}`
-//           }
-//         }
-//       );
-
-//       const replyText = response.data.choices[0].text;
-//       promises.push(client.replyMessage(lineEvent.replyToken, { type: 'text', text: replyText }));
-//     }
-//   }
-
-//   await Promise.all(promises);
-
-//   return { statusCode: 200, body: 'OK' };
-// };
-
-
-import { ClientConfig, Client, WebhookEvent } from '@line/bot-sdk';
-
-
-// アクセストークンとチャンネルシークレットをenvから読み込む
+// LINEアクセストークンとチャンネルシークレットをenvから読み込む
 const clientConfig: ClientConfig = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || '',
-  channelSecret: process.env.LINE_CHANNEL_SECRET || '',
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
+  channelSecret: process.env.LINE_CHANNEL_SECRET || "",
 };
 
-// インスタンス化
+// GPT-3のAPIキーとエンドポイントをenvから読み込む
+const gpt3ApiKey = process.env.GPT3_API_KEY!;
+const gpt3Endpoint =
+  "https://api.openai.com/v1/engines/text-davinci-003/completions";
+
+// LINE Clientインスタンス化
 const client: Client = new Client(clientConfig);
 
-// 実行
-exports.handler = async (event: any, context: any) => {
-  console.log({ event });
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    return Promise.resolve(null);
-  }
-  
-  const body: any = JSON.parse(event.body);
-  const response: WebhookEvent = body.events[0];
+/** chatGPTのAPI叩く
+ * @param inputText 入力テキスト
+ * @returns 返答テキスト
+ */
+const getChatGptResponse = async (inputText: string): Promise<string> => {
+  const { data } = await axios.post(
+    gpt3Endpoint,
+    {
+      prompt: inputText,
+      max_tokens: 250,
+      temperature: 0.7,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${gpt3ApiKey}`,
+      },
+    }
+  );
 
+  return data.choices[0].text.trimStart();
+};
+
+// 実行
+exports.handler = async (event: any, _context: any) => {
   try {
-    await client.replyMessage(event.replyToken, { type: 'text', text: JSON.stringify(event.body) });
-  } catch (err) {
-    console.log(err);
+    const body: any = JSON.parse(event.body);
+
+    if (
+      body.events[0].type !== "message" ||
+      body.events[0].message.type !== "text"
+    ) {
+      return Promise.resolve(null);
+    }
+
+    const inputText = body.events[0].message.text;
+    const replyText: string = await getChatGptResponse(inputText);
+
+    await client.replyMessage(body.events[0].replyToken, {
+      type: "text",
+      text: replyText,
+    });
+  } catch (e) {
+    console.log(e);
   }
 };
