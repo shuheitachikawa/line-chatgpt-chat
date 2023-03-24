@@ -15,7 +15,7 @@ const openApiImagesResponse = async (inputText: string): Promise<string> => {
   return data.data[0].url || "";
 };
 
-/** OPEN APIのcompletion APIを叩いて、LINEに返す */
+/** OPEN APIのImages APIを叩いて、画像URLをLINEに返す */
 export const replyOpenApiImagesResponse = async (event) => {
   const body: any = JSON.parse(event.body);
 
