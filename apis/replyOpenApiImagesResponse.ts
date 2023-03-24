@@ -1,20 +1,18 @@
 import { lineClient } from "../lineClient";
 import { openai } from "../openApiConfig";
 
-/** OPEN AIのAPI叩く(createCompletion)
+/** OPEN AIのAPI叩く(Images)
  * @param inputText 入力テキスト
- * @returns 返答テキスト
- * @see https://platform.openai.com/docs/api-reference/completions/create?lang=node.js
+ * @returns 画像URL
  */
 const openApiImagesResponse = async (inputText: string): Promise<string> => {
-  const { data } = await openai.createCompletion({
-    model: "text-davinci-003",
+  const { data } = await openai.createImage({
     prompt: inputText,
-    max_tokens: 1000,
-    temperature: 0,
+    n: 2,
+    size: "1024x1024",
   });
 
-  return (data.choices[0].text || "").trim();
+  return data.data[0].url || "";
 };
 
 /** OPEN APIのcompletion APIを叩いて、LINEに返す */
@@ -32,7 +30,8 @@ export const replyOpenApiImagesResponse = async (event) => {
   const imageUrl: string = await openApiImagesResponse(inputText);
 
   await lineClient.replyMessage(body.events[0].replyToken, {
-    type: "text",
-    text: imageUrl,
+    type: "image",
+    originalContentUrl: imageUrl,
+    previewImageUrl: imageUrl,
   });
 };

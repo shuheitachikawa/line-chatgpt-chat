@@ -4,7 +4,6 @@ import { openai } from "../openApiConfig";
 /** OPEN AIのAPI叩く(createCompletion)
  * @param inputText 入力テキスト
  * @returns 返答テキスト
- * @see https://platform.openai.com/docs/api-reference/completions/create?lang=node.js
  */
 const openApiCompletionResponse = async (
   inputText: string
