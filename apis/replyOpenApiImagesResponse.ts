@@ -16,7 +16,7 @@ export const isImageResponse = (eventBody): boolean => {
 const openApiImagesResponse = async (inputText: string): Promise<string[]> => {
   const { data } = await openai.createImage({
     prompt: inputText,
-    n: 2,
+    n: 3,
     size: "256x256",
   });
 
