@@ -1,13 +1,22 @@
 import { replyOpenApiCompletionResponse } from "./apis/replyOpenApiCompletionResponse";
 import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from "aws-lambda";
+
+import {
   isImageResponse,
   replyOpenApiImagesResponse,
 } from "./apis/replyOpenApiImagesResponse";
 import { requestType } from "./lib/requests";
 
-exports.handler = async (event: any, _context: any) => {
+exports.handler = async (
+  event: APIGatewayProxyEvent,
+  _context: Context
+): Promise<APIGatewayProxyResult> => {
   try {
-    const eventBody: any = JSON.parse(event.body);
+    const eventBody = JSON.parse(event.body);
 
     switch (requestType(eventBody)) {
       case "text":
