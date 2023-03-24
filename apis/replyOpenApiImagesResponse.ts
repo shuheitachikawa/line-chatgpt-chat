@@ -1,8 +1,6 @@
 import { lineClient } from "../lineClient";
 import { openai } from "../openApiConfig";
 
-const { Configuration, OpenAIApi } = require("openai");
-
 /** OPEN AIのAPI叩く(createCompletion)
  * @param inputText 入力テキスト
  * @returns 返答テキスト
