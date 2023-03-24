@@ -17,7 +17,7 @@ const openApiImagesResponse = async (inputText: string): Promise<string[]> => {
   const { data } = await openai.createImage({
     prompt: inputText,
     n: 2,
-    size: "1024x1024",
+    size: "256x256",
   });
 
   return data.data.map((i) => i.url || "");
