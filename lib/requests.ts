@@ -1,12 +1,16 @@
-/** LINEからの入力がテキストか */
-export const isTextRequest = (eventBody): boolean => {
-  const body: any = JSON.parse(eventBody);
+type RequestType = "text" | undefined;
+
+/** LINEからのリクエストタイプを返す
+ *  @param eventBody LINEからのリクエスト
+ *  @returns RequestType
+ */
+export const requestType = (eventBody): RequestType => {
   if (
-    body.events[0].type !== "message" ||
-    body.events[0].message.type !== "text"
+    eventBody.events[0].type === "message" &&
+    eventBody.events[0].message.type === "text"
   ) {
-    return false;
+    return "text";
   }
 
-  return true;
+  return undefined;
 };

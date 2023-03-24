@@ -1,18 +1,32 @@
 import { replyOpenApiCompletionResponse } from "./apis/replyOpenApiCompletionResponse";
 import {
-  isImageRequest,
+  isImageResponse,
   replyOpenApiImagesResponse,
 } from "./apis/replyOpenApiImagesResponse";
+import { requestType } from "./lib/requests";
 
-// 実行
 exports.handler = async (event: any, _context: any) => {
   try {
-    if (isImageRequest(event)) {
-      await replyOpenApiImagesResponse(event);
-    } else {
-      await replyOpenApiCompletionResponse(event);
+    const eventBody: any = JSON.parse(event.body);
+
+    switch (requestType(eventBody)) {
+      case "text":
+        await textInputOparation(eventBody);
+        break;
+      default:
+        break;
     }
   } catch (e) {
     console.log(e);
+  }
+};
+
+/** LINEからの入力がテキストの時の処理 */
+const textInputOparation = async (eventBody): Promise<void> => {
+  // 画像を返してほしいリクエストか
+  if (isImageResponse(eventBody)) {
+    await replyOpenApiImagesResponse(eventBody);
+  } else {
+    await replyOpenApiCompletionResponse(eventBody);
   }
 };

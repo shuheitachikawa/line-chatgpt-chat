@@ -1,16 +1,12 @@
 import { TemplateImageColumn } from "@line/bot-sdk";
-import { isTextRequest } from "../lib/requests";
 import { lineClient } from "../lineClient";
 import { openai } from "../openApiConfig";
 
-/** 画像を返してほしいリクエストか */
-export const isImageRequest = (event): boolean => {
-  const body: any = JSON.parse(event.body);
-  if (!isTextRequest(event.body)) return false;
+/** 画像を返してほしいか */
+export const isImageResponse = (eventBody): boolean => {
+  const inputText = eventBody.events[0].message.text;
 
-  const inputText = body.events[0].message.text;
-
-  if (inputText.ingludes("の画像")) return true;
+  if (inputText.includes("の画像")) return true;
 
   return false;
 };
@@ -30,12 +26,9 @@ const openApiImagesResponse = async (inputText: string): Promise<string[]> => {
 };
 
 /** OPEN APIのImages APIを叩いて、画像URLをLINEに返す */
-export const replyOpenApiImagesResponse = async (event) => {
-  const body: any = JSON.parse(event.body);
+export const replyOpenApiImagesResponse = async (eventBody) => {
+  const inputText = eventBody.events[0].message.text;
 
-  if (!isTextRequest(body)) return Promise.resolve(null);
-
-  const inputText = body.events[0].message.text;
   const imageUrls: string[] = await openApiImagesResponse(inputText);
 
   const columns: TemplateImageColumn[] = imageUrls.map((imageUrl, i) => {
@@ -49,7 +42,7 @@ export const replyOpenApiImagesResponse = async (event) => {
     };
   });
 
-  await lineClient.replyMessage(body.events[0].replyToken, {
+  await lineClient.replyMessage(eventBody.events[0].replyToken, {
     type: "template",
     altText: inputText,
     template: {

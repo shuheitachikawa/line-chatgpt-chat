@@ -1,4 +1,3 @@
-import { isTextRequest } from "../lib/requests";
 import { lineClient } from "../lineClient";
 import { openai } from "../openApiConfig";
 
@@ -20,15 +19,11 @@ const openApiCompletionResponse = async (
 };
 
 /** OPEN APIのcompletion APIを叩いて、LINEに返す */
-export const replyOpenApiCompletionResponse = async (event) => {
-  const body: any = JSON.parse(event.body);
-
-  if (!isTextRequest(body)) return Promise.resolve(null);
-
-  const inputText = body.events[0].message.text;
+export const replyOpenApiCompletionResponse = async (eventBody) => {
+  const inputText = eventBody.events[0].message.text;
   const replyText: string = await openApiCompletionResponse(inputText);
 
-  await lineClient.replyMessage(body.events[0].replyToken, {
+  await lineClient.replyMessage(eventBody.events[0].replyToken, {
     type: "text",
     text: replyText,
   });
