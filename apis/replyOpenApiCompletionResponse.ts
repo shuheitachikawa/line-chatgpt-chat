@@ -1,3 +1,4 @@
+import { isTextRequest } from "../lib/requests";
 import { lineClient } from "../lineClient";
 import { openai } from "../openApiConfig";
 
@@ -22,12 +23,7 @@ const openApiCompletionResponse = async (
 export const replyOpenApiCompletionResponse = async (event) => {
   const body: any = JSON.parse(event.body);
 
-  if (
-    body.events[0].type !== "message" ||
-    body.events[0].message.type !== "text"
-  ) {
-    return Promise.resolve(null);
-  }
+  if (!isTextRequest(body)) return Promise.resolve(null);
 
   const inputText = body.events[0].message.text;
   const replyText: string = await openApiCompletionResponse(inputText);

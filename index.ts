@@ -1,11 +1,17 @@
 import { replyOpenApiCompletionResponse } from "./apis/replyOpenApiCompletionResponse";
-import { replyOpenApiImagesResponse } from "./apis/replyOpenApiImagesResponse";
+import {
+  isImageRequest,
+  replyOpenApiImagesResponse,
+} from "./apis/replyOpenApiImagesResponse";
 
 // 実行
 exports.handler = async (event: any, _context: any) => {
   try {
-    // await replyOpenApiCompletionResponse(event);
-    await replyOpenApiImagesResponse(event);
+    if (isImageRequest(event)) {
+      await replyOpenApiImagesResponse(event);
+    } else {
+      await replyOpenApiCompletionResponse(event);
+    }
   } catch (e) {
     console.log(e);
   }
