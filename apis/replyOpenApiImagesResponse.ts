@@ -5,6 +5,8 @@ import { openai } from "../openApiConfig";
 /** 画像を返してほしいか */
 export const isImageResponse = (eventBody): boolean => {
   const inputText = eventBody.events[0].message.text;
+  // const requestText = `「${inputText}」これが画像を求めている文章かどうかtrue or false のみで返して。小文字で。`;
+  // return (await openApiCompletionResponse(requestText)) === "true";
 
   return inputText.includes("の画像");
 };
