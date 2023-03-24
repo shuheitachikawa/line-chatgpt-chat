@@ -6,9 +6,7 @@ import { openai } from "../openApiConfig";
 export const isImageResponse = (eventBody): boolean => {
   const inputText = eventBody.events[0].message.text;
 
-  if (inputText.includes("の画像")) return true;
-
-  return false;
+  return inputText.includes("の画像");
 };
 
 /** OPEN AIのAPI叩く(Images)
